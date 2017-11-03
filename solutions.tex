@@ -1,0 +1,299 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%This is a science homework template. Modify the preamble to suit your needs. 
+%The junk text is   there for you to immediately see how the headers/footers look at first 
+%typesetting.
+
+
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc} 
+
+% packages
+\usepackage{amsmath} 
+%geometry (sets margin) and other useful packages
+\usepackage[margin=1.25in]{geometry}
+\usepackage{graphicx,ctable,booktabs}
+\usepackage[obeyspaces]{url}% http://ctan.org/pkg/url
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{lmodern} % for bold teletype font
+\usepackage{minted}
+
+
+
+
+%
+%Redefining sections as problems
+%
+\makeatletter
+\newenvironment{problem}{\@startsection
+	{section}
+	{1}
+	{-.2em}
+	{-3.5ex plus -1ex minus -.2ex}
+	{2.3ex plus .2ex}
+	{\pagebreak[3]%forces pagebreak when space is small; use \eject for better results
+		\large\bf\noindent{Exercise }
+	}
+}
+{\vspace{0.8cm}}
+%{\vspace{1ex}\begin{center} \rule{0.3\linewidth}{.3pt}\end{center}}
+%	\begin{center}\large\bf \ldots\ldots\ldots\end{center}}
+\makeatother
+
+
+%
+%Fancy-header package to modify header/page numbering 
+%
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+%\addtolength{\headwidth}{\marginparsep} %these change header-rule width
+%\addtolength{\headwidth}{\marginparwidth}
+\lhead{Exercise \thesection}
+\chead{} 
+\rhead{\thepage} 
+\lfoot{\small\scshape Resources of Open Data} 
+\cfoot{} 
+\rfoot{\footnotesize DH Estonia} 
+\renewcommand{\headrulewidth}{.3pt} 
+\renewcommand{\footrulewidth}{.3pt}
+\setlength\voffset{-0.25in}
+\setlength\textheight{648pt}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+%Contents of problem set
+%    
+\begin{document}
+	
+	\title{Resources of Open Data: Exercise Solutions}
+	\author{Maksim Misin}
+	\date{November 3, 2017}
+	
+	\maketitle
+	
+	\thispagestyle{empty}
+	
+	%Example problems
+	\begin{problem}{\it OpenAIRE}
+
+	
+	\begin{enumerate}[label=\textbf{\alph*)},leftmargin=*]
+		\item Root URL: \url{http://api.openaire.eu/search}. Endpoints are: \texttt{publications}, \texttt{datasets}, \texttt{projects}.
+		
+		By default response is in XML format. To obtain JSON response add \texttt{format=json} parameter to URL.
+		
+		\item The number of returned datasets is specified in \texttt{response/header/query/size} part of the response. \texttt{response/header/query/total} shows the total number of results satisfying search criteria. To narrow the results add \texttt{size=300} parameter to query.
+		
+		\item To get results in CSV format use \texttt{format=csv}.
+		
+	\end{enumerate}
+		
+	\end{problem}
+	
+	
+	\begin{problem}{\it Figshare}
+		
+	\begin{enumerate}[label=\textbf{\alph*)},leftmargin=*]
+	\item 15 most viewed articles: 
+	\begin{minted}[tabsize=4]{text}
+https://api.figshare.com/v2/articles?
+	page_size=15&
+	order=views&
+	order_direction=desc
+	\end{minted}
+	and collections:
+	\begin{minted}[tabsize=4]{text}
+https://api.figshare.com/v2/collections?
+	page_size=15&
+	order=views&
+	order_direction=desc
+\end{minted}
+
+	
+	\item For example, to search for "social media" datasets we send a POST request to \url{https://api.figshare.com/v2/articles/search} endpoint with the following body:
+	\begin{minted}[tabsize=4]{js}
+{
+	"item_type": 3,
+	"search_for": "social media",
+	"page": 1,
+	"page_size": 1000,
+	"order": "views",
+	"order_direction": "desc",
+	"published_since": "2016-01-01"
+}
+	\end{minted}
+	
+	\item An example of article details endpoint: \url{https://api.figshare.com/v2/articles/5539834}. Download links are associated with \texttt{download\_url} keys. To download all files you can for example use python \texttt{urllib} and \texttt{json} libraries.
+	
+	
+	
+	\end{enumerate}
+	
+		
+	\end{problem}
+
+
+	\begin{problem}{\it Plos ONE}
+	
+	
+	\begin{enumerate}[label=\textbf{\alph*)},leftmargin=*]
+		\item 	\begin{minted}[tabsize=4]{text}
+http://api.plos.org/search?
+	q=abstract:economic AND body:Estonia&
+	wt=json
+		\end{minted}	
+		
+		\item  \begin{minted}[tabsize=4]{text}
+http://api.plos.org/search?
+	q=subject:"social sciences" AND
+		publication_date:[2014-01-01T00:00:00Z TO 2015-01-01T00:00:00Z] AND 
+		doc_type:full&
+	wt=json&
+	fl=title,pagecount,counter_total_all,alm_scopusCiteCount&
+	rows=500
+		\end{minted}	
+		
+		\item Assuming that we got the following response:
+		\begin{minted}[tabsize=4]{js}
+{
+	"response": {
+		"numFound": 4521,
+		"start": 0,
+		"docs": [
+			{
+				"alm_scopusCiteCount": 6,
+				"counter_total_all": 47605,
+				"pagecount": 7,
+				"title": "Globalization and Econ..."
+			},
+			{
+				"alm_scopusCiteCount": 18,
+				"counter_total_all": 24113,
+				"pagecount": 15,
+				"title": "Gender on the Brain: A Cas..."
+			},
+			{
+				"alm_scopusCiteCount": 2,
+				"counter_total_all": 4961,
+				"pagecount": 8,
+				"title": "Evidence for the Identifi..."
+			}
+		]
+	}
+}
+\end{minted}
+
+
+	we delete everything unrelated to the articles:
+		\begin{minted}[tabsize=4]{js}
+[
+	{
+		"alm_scopusCiteCount": 6,
+		"counter_total_all": 47605,
+		"pagecount": 7,
+		"title": "Globalization and Econ..."
+	},
+	{
+		"alm_scopusCiteCount": 18,
+		"counter_total_all": 24113,
+		"pagecount": 15,
+		"title": "Gender on the Brain: A Cas..."
+	},
+	{
+		"alm_scopusCiteCount": 2,
+		"counter_total_all": 4961,
+		"pagecount": 8,
+		"title": "Evidence for the Identifi..."
+	}
+]
+\end{minted}
+	\end{enumerate}
+
+	and after conversion with \url{https://sqlify.io} obtain the following CSV:
+\begin{minted}[tabsize=4]{text}
+alm_scopusCiteCount,counter_total_all,pagecount,title
+6,47605,7,Globalization and Econ...
+18,24113,15,Gender on the Brain: A Cas...
+2,4961,8,Evidence for the Identifi...
+\end{minted}
+
+	The subsequent analyses can be done in a number of ways depending on your method of choice for tabulated data manipulations.
+
+\end{problem}
+
+\begin{problem}{\it Figshare}
+	
+	\begin{enumerate}[label=\textbf{\alph*)},leftmargin=*]
+\item Assuming we picked Swiss medieval manuscripts repository, the formatted manifest file is going to look like this:
+\begin{minted}[tabsize=4]{js}
+{
+	"@context": "http://iiif.io/api/presentation/2/context.json",
+	"@id": "http://www.e-codices.unifr.ch/metadata/iiif/kba-0...",
+	"@type": "sc:Manifest",
+	"label": "Aarau, Aargauer Kantonsbibliothek, MsMurF 3",
+	"metadata": [
+		{
+			"label": "Location",
+			"value": "Aarau"
+		},
+		{
+			"label": "Date",
+			"value": [
+				{
+					"@value": "1508",
+					"@language": "de"
+				},
+				{
+					"@value": "1508",
+					"@language": "en"
+				},
+				{
+					"@value": "1508",
+					"@language": "fr"
+				},
+				{
+					"@value": "1508",
+					"@language": "it"
+				}
+			]
+		}
+	],
+	"description": [
+		{
+			"@value": "Pontificale für Johannes Feie...",
+			"@language": "de"
+		...
+}
+
+\end{minted}
+
+	\item The first image URL in case of the above manuscript is the following: 
+	\begin{minted}{text}
+http://www.e-codices.unifr.ch/loris/kba/kba-0003/
+	kba-0003_e001.jp2/full/full/0/default.jpg
+	\end{minted}
+	
+	\item The JSONPath returning links to images for the above manifest is:
+	\mint{text}|$.sequences[*].canvases[*].images[*].resource.@id|
+	
+	After copying links and removing all commas and quotes the resulting file should look like this:
+	
+	\begin{minted}{text}
+http://www.e-codices.unifr.ch:80/l...03__e001.jp2/full/full/0/default.jpg
+http://www.e-codices.unifr.ch:80/l...03__e005.jp2/full/full/0/default.jpg
+http://www.e-codices.unifr.ch:80/l...03__000a.jp2/full/full/0/default.jpg
+http://www.e-codices.unifr.ch:80/l...03__000b.jp2/full/full/0/default.jpg
+http://www.e-codices.unifr.ch:80/l...03__000c.jp2/full/full/0/default.jpg
+http://www.e-codices.unifr.ch:80/l...03__000d.jp2/full/full/0/default.jpg
+...
+	\end{minted}
+	Then we can download all links with \texttt{wget} via 
+	\mint{bash}|wget -i links.txt|
+	\end{enumerate}
+\end{problem}
+	
+\end{document}
